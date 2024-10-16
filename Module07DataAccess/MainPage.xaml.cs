@@ -6,13 +6,11 @@ namespace Module07DataAccess;
 public partial class MainPage : ContentPage
 {
     int count = 0;
-
     private readonly DatabaseConnectionService _databaseConnectionService;
 
     public MainPage()
     {
         InitializeComponent();
-        // Initialize Database Connection
         _databaseConnectionService = new DatabaseConnectionService();
     }
 
@@ -30,7 +28,7 @@ public partial class MainPage : ContentPage
 
     private async void OnTestConnectionClicked(object sender, EventArgs e)
     {
-        var connectionString = _databaseConnectionService.GetConnectionString(); // Fixed variable name
+        var connectionString = _databaseConnectionService.GetConnectionString();
         try
         {
             using (var connection = new MySqlConnection(connectionString))
@@ -42,8 +40,13 @@ public partial class MainPage : ContentPage
         }
         catch (Exception ex)
         {
-            ConnectionStatusLabel.Text = $"Connection Failed: {ex.Message}"; // Fixed string formatting
+            ConnectionStatusLabel.Text = $"Connection Failed: {ex.Message}";
             ConnectionStatusLabel.TextColor = Colors.Red;
         }
+    }
+
+    private async void OpenViewEmployee(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("//ViewEmployee");
     }
 }

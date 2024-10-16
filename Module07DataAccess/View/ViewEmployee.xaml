@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Module07DataAccess.View.ViewEmployee"
+             Title="Employee Information"
+             BackgroundColor="#FAF7F0">
+
+    <VerticalStackLayout Padding="20" Spacing="15">
+        <Label Text="Employee Information"
+               FontSize="24"
+               HorizontalOptions="Center"
+               TextColor="#4A4947"/>
+
+        <ListView ItemsSource="{Binding Employees}"
+                  BackgroundColor="#D8D2C2"
+                  SeparatorColor="#B17457">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Padding="10" BackgroundColor="#FAF7F0">
+                            <Label Text="{Binding Name}"
+                                   FontSize="18"
+                                   TextColor="#4A4947"/>
+                            <Label Text="{Binding Email}"
+                                   FontSize="14"
+                                   TextColor="#B17457"/>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <Button Text="Load Data"
+                Command="{Binding LoadDataCommand}"
+                BackgroundColor="#B17457"
+                TextColor="White"
+                CornerRadius="5"/>
+
+        <Label x:Name="ConnectionsStatusLabel"
+               Text="{Binding StatusMessage}"
+               FontSize="18"
+               HorizontalOptions="Center"
+               TextColor="#4A4947"/>
+    </VerticalStackLayout>
+</ContentPage>

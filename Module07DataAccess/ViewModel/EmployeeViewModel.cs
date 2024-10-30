@@ -25,6 +25,42 @@ namespace Module07DataAccess.ViewModel
             }
         }
 
+        private Employee _selectedEmployee;
+
+        public Employee SelectedEmployee
+        {
+            get=> _selectedEmployee;
+            set
+            {
+                _selectedEmployee = value;
+                if (_selectedEmployee != null)
+                {
+                    NewEmployeeName = _selectedEmployee.Name;
+                    NewEmployeeAddress = _selectedEmployee.Address;
+                    NewEmployeeEmail = _selectedEmployee.Email;
+                    NewEmployeeContactNo = _selectedEmployee.ContactNo;
+                    IsEmployeeSelected = true;
+                }
+                else
+                {
+                    IsEmployeeSelected = false;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isEmployeeSelected;
+
+        public bool IsEmployeeSelected
+        {
+            get => _isEmployeeSelected;
+            set
+            {
+                _isEmployeeSelected = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string _statusMessage;
         public string StatusMessage
         {
@@ -36,15 +72,74 @@ namespace Module07DataAccess.ViewModel
             }
         }
 
+        private string _newEmployeeName;
+
+        public string NewEmployeeName
+        {
+            get => _newEmployeeName;
+            set
+            {
+                _newEmployeeName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _newEmployeeAddress;
+
+        public string NewEmployeeAddress
+        {
+            get => _newEmployeeAddress;
+            set
+            {
+                _newEmployeeAddress = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _newEmployeeEmail;
+
+        public string NewEmployeeEmail
+        {
+            get => _newEmployeeEmail;
+            set
+            {
+                _newEmployeeEmail = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _newEmployeeContactNo;
+
+        public string NewEmployeeContactNo
+        {
+            get => _newEmployeeContactNo;
+            set
+            {
+                _newEmployeeContactNo = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand LoadDataCommand { get; }
 
+        public ICommand AddEmployeeCommand { get; }
+
+        public ICommand SelectedEmployeeCommand { get; }
+
+        public ICommand DeleteEmployeeCommand { get; }
         // EmployeeViewModel Constructor
         public EmployeeViewModel()
         {
             _employeeService = new EmployeeService(); // Updated service initialization
             Employees = new ObservableCollection<Employee>(); // Updated property initialization
 
+
             LoadDataCommand = new Command(async () => await LoadData());
+            AddEmployeeCommand = new Command(async () => await AddEmployee());
+            SelectedEmployeeCommand = new Command<Employee>(employee => SelectedEmployee = employee);
+            DeleteEmployeeCommand = new Command(async() => 
+                                    await DeleteEmployee(),
+                                    () => SelectedEmployee != null);
 
             LoadData();
         }
@@ -67,6 +162,80 @@ namespace Module07DataAccess.ViewModel
             catch (Exception ex)
             {
                 StatusMessage = $"Failed to load data: {ex.Message}";
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task AddEmployee()
+        {
+            if (IsBusy || string.IsNullOrWhiteSpace(NewEmployeeName) || string.IsNullOrWhiteSpace(NewEmployeeAddress) || string.IsNullOrWhiteSpace(NewEmployeeEmail) || string.IsNullOrWhiteSpace(NewEmployeeContactNo))
+            {
+                StatusMessage = "Please fill in all the fields before adding";
+                return;
+            }
+            IsBusy = true;
+            StatusMessage = "Adding new employee . . . ";
+
+            try
+            {
+                var newEmployee = new Employee
+                {
+                    Name = NewEmployeeName,
+                    Address = NewEmployeeAddress,
+                    Email = NewEmployeeEmail,
+                    ContactNo = NewEmployeeContactNo,
+                };
+                var isSuccess = await _employeeService.AddEmployeeAsync(newEmployee);
+                if (isSuccess)
+                {
+                    NewEmployeeName = string.Empty;
+                    NewEmployeeAddress = string.Empty;
+                    NewEmployeeEmail = string.Empty;
+                    NewEmployeeContactNo = string.Empty;
+                    StatusMessage = "New Employee Added Successfuly";
+                }
+                else
+                {
+                    StatusMessage = "Failed to add the new employee";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Failed adding person: {ex.Message}";
+            }
+            finally {  
+                IsBusy = false; 
+                await LoadData();
+            }
+        }
+
+        private async Task DeleteEmployee()
+        {
+            if (SelectedEmployee == null) return;
+            var answer = await Application.Current.MainPage.DisplayAlert("Confirm Delete", $"Are you sure you want to delete {SelectedEmployee.Name}?",
+                "Yes", "No");
+
+            if (!answer) return;
+
+            IsBusy = true;
+            StatusMessage = "Deleting person...";
+            try
+            {
+                var success = await _employeeService.DeleteEmployeeAsync(SelectedEmployee.EmployeeID);
+                StatusMessage = success ? "Employee deleted successfully!" : "Failed to delete employee";
+
+                if (success)
+                {
+                    Employees.Remove(SelectedEmployee);
+                    SelectedEmployee = null;
+                }
+            }
+            catch(Exception ex)
+            {
+                StatusMessage = $"Error deleting person: {ex.Message}";
             }
             finally
             {

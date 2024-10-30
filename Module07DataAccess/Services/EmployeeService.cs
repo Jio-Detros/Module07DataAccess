@@ -44,5 +44,52 @@ namespace Module07DataAccess.Services
             }
             return employees; // Correctly returning the employee list
         }
+
+
+        public async Task<bool> AddEmployeeAsync(Employee newEmployee)
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+                    var cmd = new MySqlCommand("INSERT INTO tblEmployee (Name, Address, Email, ContactNo) VALUES (@Name, @Address, @Email, @ContactNo)", conn);
+                    cmd.Parameters.AddWithValue("@Name", newEmployee.Name);
+                    cmd.Parameters.AddWithValue("@Address", newEmployee.Address);
+                    cmd.Parameters.AddWithValue("@Email", newEmployee.Email);
+                    cmd.Parameters.AddWithValue("@ContactNo", newEmployee.ContactNo);
+
+                    var result = await cmd.ExecuteNonQueryAsync();
+
+                    return result > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding Employee Record: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteEmployeeAsync(int id)
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+                    var cmd = new MySqlCommand("DELETE FROM tblEmployee WHERE EmployeeID = @ID", conn);
+                    cmd.Parameters.AddWithValue("@ID", id);
+
+                    var result = await cmd.ExecuteNonQueryAsync();
+                    return result > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting employee record: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

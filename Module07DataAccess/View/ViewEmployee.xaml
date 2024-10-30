@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Module07DataAccess.ViewModel"
              x:Class="Module07DataAccess.View.ViewEmployee"
              Title="Employee Information"
              BackgroundColor="#FAF7F0">
@@ -12,8 +13,10 @@
                TextColor="#4A4947"/>
 
         <ListView ItemsSource="{Binding Employees}"
+                  SelectedItem="{Binding SelectedEmployee}" 
                   BackgroundColor="#D8D2C2"
-                  SeparatorColor="#B17457">
+                  SeparatorColor="#B17457">     
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
@@ -24,6 +27,12 @@
                             <Label Text="{Binding Email}"
                                    FontSize="14"
                                    TextColor="#B17457"/>
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type local:EmployeeViewModel}}, 
+                                    Path=SelectedEmployeeCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            </StackLayout.GestureRecognizers>
                         </StackLayout>
                     </ViewCell>
                 </DataTemplate>
@@ -35,6 +44,18 @@
                 BackgroundColor="#B17457"
                 TextColor="White"
                 CornerRadius="5"/>
+
+        <Label Text="Add New Employee" FontSize="Large" TextColor="Black"/>
+        <Entry Placeholder="Name" Text="{Binding NewEmployeeName}" TextColor="Black"/>
+        <Entry Placeholder="Address" Text="{Binding NewEmployeeAddress}" TextColor="Black"/>
+        <Entry Placeholder="Email" Text="{Binding NewEmployeeEmail}" TextColor="Black"/>
+        <Entry Placeholder="ContactNo" Text="{Binding NewEmployeeContactNo}" TextColor="Black"/>
+
+        <StackLayout>
+            <Button Text="Add Employee" Command="{Binding AddEmployeeCommand}"/>
+            <Button Text="Delete Emplyee" Command="{Binding DeleteEmployeeCommand}" IsEnabled="{Binding IsEmployeeSelected}"/>
+        </StackLayout>
+        
 
         <Label x:Name="ConnectionsStatusLabel"
                Text="{Binding StatusMessage}"

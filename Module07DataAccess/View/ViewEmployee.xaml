@@ -53,7 +53,7 @@
 
         <StackLayout>
             <Button Text="Add Employee" Command="{Binding AddEmployeeCommand}"/>
-            <Button Text="Delete Emplyee" Command="{Binding DeleteEmployeeCommand}" IsEnabled="{Binding IsEmployeeSelected}"/>
+            <Button Text="Delete Employee" Command="{Binding DeleteEmployeeCommand}" IsEnabled="{Binding IsEmployeeSelected}"/>
         </StackLayout>
         
 
